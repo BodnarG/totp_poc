@@ -16,7 +16,11 @@ public interface TOTPHandler {
         return base32.encodeToString(bytes);
     }
 
-    String getTOTPCode(String secretKey);
+    default byte[] generateSecret() {throw new UnsupportedOperationException();}
+
+    default String getTOTPCode(String secretKey){throw new UnsupportedOperationException();}
+
+    default String getTOTPCode(byte[] secret){throw new UnsupportedOperationException();}
 
     boolean verifyTOTP(String secretKey, String submittedOTP);
 
