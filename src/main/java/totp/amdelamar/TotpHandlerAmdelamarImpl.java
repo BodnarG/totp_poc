@@ -12,7 +12,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 public class TotpHandlerAmdelamarImpl implements TOTPHandler {
-
     private final int length;
     private String secretKey;
 
@@ -20,11 +19,6 @@ public class TotpHandlerAmdelamarImpl implements TOTPHandler {
         super();
         this.length = length;
         this.secretKey = generateSecretKeyAsString();
-    }
-
-    @Override
-    public String generateSecretKeyAsString() {
-        return OTP.randomBase32(length);
     }
 
     @Override
@@ -44,14 +38,18 @@ public class TotpHandlerAmdelamarImpl implements TOTPHandler {
     }
 
     @Override
-    public String getBarCodeURL(String account, String issuer) throws URISyntaxException {
+    public String getBarCodeURL(String account, String issuer) {
         try {
             return "otpauth://totp/"
                     + Utils.urlEncodeAndReplacePlus(issuer + ":" + account)
                     + "?secret=" + Utils.urlEncodeAndReplacePlus(secretKey)
                     + "&issuer=" + Utils.urlEncodeAndReplacePlus(issuer);
         } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
+            throw new RuntimeException(e);
         }
+    }
+
+    private String generateSecretKeyAsString() {
+        return OTP.randomBase32(length);
     }
 }

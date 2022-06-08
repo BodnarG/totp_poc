@@ -47,7 +47,7 @@ public class TOTPHandlerTaimosImpl implements TOTPHandler {
                     + "?secret=" + Utils.urlEncodeAndReplacePlus(secretKey)
                     + "&issuer=" + Utils.urlEncodeAndReplacePlus(issuer);
         } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
+            throw new RuntimeException(e);
         }
     }
 }

@@ -11,6 +11,7 @@ import totp.Utils;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -84,10 +85,12 @@ public class TOTPHandlerJChambersImpl implements TOTPHandler {
     }
 
     @Override
-    public void saveQRCodeToFile(String barCodeData, String filePath, int height, int width) throws WriterException, IOException {
-        BitMatrix matrix = new MultiFormatWriter().encode(barCodeData, BarcodeFormat.QR_CODE, width, height);
+    public void saveQRCodeToFile(String barCodeData, String filePath, int height, int width) {
         try (FileOutputStream out = new FileOutputStream(filePath)) {
+            BitMatrix matrix = new MultiFormatWriter().encode(barCodeData, BarcodeFormat.QR_CODE, width, height);
             MatrixToImageWriter.writeToStream(matrix, "png", out);
+        } catch (IOException | WriterException e) {
+            e.printStackTrace();
         }
     }
 }

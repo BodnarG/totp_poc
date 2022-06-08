@@ -37,12 +37,6 @@ public class TOTPHandlerSamDJStevens implements TOTPHandler {
     }
 
     @Override
-    public String generateSecretKeyAsString() {
-        DefaultSecretGenerator secretGenerator = new DefaultSecretGenerator();
-        return secretGenerator.generate();
-    }
-
-    @Override
     public String getTOTPCode() {
         return null;
     }
@@ -56,7 +50,7 @@ public class TOTPHandlerSamDJStevens implements TOTPHandler {
     }
 
     @Override
-    public String getBarCodeURL(String account, String issuer) throws URISyntaxException {
+    public String getBarCodeURL(String account, String issuer) {
         try {
             return "otpauth://totp/"
                     + Utils.urlEncodeAndReplacePlus(issuer + ":" + account)
@@ -68,7 +62,7 @@ public class TOTPHandlerSamDJStevens implements TOTPHandler {
     }
 
     @Override
-    public void saveQRCodeToFile(String barCodeData, String filePath, int height, int width) throws WriterException, IOException {
+    public void saveQRCodeToFile(String barCodeData, String filePath, int height, int width) {
 //        QrData data = new QrData.Builder()
 //                .label(email)
 //                .secret(secretKey)
@@ -91,5 +85,10 @@ public class TOTPHandlerSamDJStevens implements TOTPHandler {
 //        String dataUri = getDataUriForImage(imageData, mimeType);
 
         TOTPHandler.super.saveQRCodeToFile(barCodeData, filePath, height, width);
+    }
+
+    private String generateSecretKeyAsString() {
+        DefaultSecretGenerator secretGenerator = new DefaultSecretGenerator();
+        return secretGenerator.generate();
     }
 }
