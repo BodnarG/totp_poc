@@ -1,5 +1,7 @@
 package totp;
 
+import totp.jchambers.TOTPHandlerJChambersImpl;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -33,13 +35,33 @@ public class Utils {
         Scanner scanner = new Scanner(System.in);
 
         String code = scanner.nextLine();
-        if (totpHandler.verifyTOTP(secretKey, code)) {
-            System.out.println("Logged in successfully");
+        boolean success = false;
+        if (totpHandler instanceof TOTPHandlerJChambersImpl handler
+                && totpHandler.verifyTOTP(handler.getKey(), code)) {
+            success = true;
         } else {
-            System.out.println("Invalid 2FA Code");
-            System.out.println("Try again!");
+            if (totpHandler.verifyTOTP(secretKey, code)) {
+                success = true;
+            }
+        }
+
+        String classname = totpHandler.getClass().getCanonicalName();
+        if(success) {
+            System.out.println(classname + " > Logged in successfully");
+        } else {
+            System.out.println(classname + " > Invalid 2FA Code");
+            System.out.println(classname + " > Try again!");
             verifyToken(totpHandler, secretKey);
         }
+
+    }
+
+    public static String byteArrayToString(byte[] arr) {
+        StringBuilder builder = new StringBuilder();
+        for(byte b : arr) {
+            builder.append(b);
+        }
+        return builder.toString();
     }
 
 
