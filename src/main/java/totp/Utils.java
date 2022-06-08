@@ -43,13 +43,11 @@ public class Utils {
         }
     }
 
-    public static String byteArrayToString(byte[] arr) {
-        StringBuilder builder = new StringBuilder();
-        for(byte b : arr) {
-            builder.append(b);
-        }
-        return builder.toString();
-    }
-
-
+//    public static String byteArrayToString(byte[] arr) {
+//        StringBuilder builder = new StringBuilder();
+//        for(byte b : arr) {
+//            builder.append(b);
+//        }
+//        return builder.toString();
+//    }
 }
