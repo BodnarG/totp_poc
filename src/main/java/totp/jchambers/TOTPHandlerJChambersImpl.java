@@ -11,7 +11,6 @@ import totp.Utils;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.Mac;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

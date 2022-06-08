@@ -7,13 +7,12 @@ import totp.Utils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 public class TotpHandlerAmdelamarImpl implements TOTPHandler {
     private final int length;
-    private String secretKey;
+    private final String secretKey;
 
     public TotpHandlerAmdelamarImpl(int length) {
         super();
@@ -23,7 +22,7 @@ public class TotpHandlerAmdelamarImpl implements TOTPHandler {
 
     @Override
     public String getTOTPCode() {
-        String hexTime = null;
+        String hexTime;
         try {
             hexTime = OTP.timeInHex(System.currentTimeMillis(), 30);
             return OTP.create(secretKey, hexTime, 6, Type.TOTP);

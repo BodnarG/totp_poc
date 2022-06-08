@@ -3,9 +3,6 @@ import totp.TOTPHandler;
 import totp.Utils;
 import totp.amdelamar.TotpHandlerAmdelamarImpl;
 import totp.samdjstevens.TOTPHandlerSamDJStevens;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -13,7 +10,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Main {
-    public static void main(String[] args) throws IOException, WriterException, URISyntaxException {
+    public static void main(String[] args) {
         final long now = System.currentTimeMillis();
         String email = "test_" + now + "_@gmail.com";
         String companyName = "Awesome_Company_" + now;
@@ -25,7 +22,7 @@ public class Main {
 
         String barCodeUrl = totpHandler.getBarCodeURL(email, companyName);
         System.out.println("\tbarCodeUrl: \t" + barCodeUrl);
-        System.out.println("\tCurrent code: " + totpHandler.getTOTPCode());
+        System.out.println("\tCurrent code: \t" + totpHandler.getTOTPCode());
 
         totpHandler.saveQRCodeToFile(barCodeUrl, "QRCode_" + now + ".png", 400, 400);
 
