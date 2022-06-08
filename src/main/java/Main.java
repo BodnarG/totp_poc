@@ -1,8 +1,7 @@
 import com.google.zxing.WriterException;
 import totp.TOTPHandler;
 import totp.Utils;
-import totp.bastiaanjansen.TOTPHandlerBastiaanJansenImpl;
-import totp.taimos.TOTPHandlerTaimosImpl;
+import totp.amdelamar.TotpHandlerAmdelamarImpl;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -18,9 +17,9 @@ public class Main {
         String email = "test_" + now + "_@gmail.com";
         String companyName = "Awesome_Company_" + now;
 
-        TOTPHandler totpHandler = new TOTPHandlerTaimosImpl();
+//        TOTPHandler totpHandler = new TOTPHandlerTaimosImpl();
 //        TOTPHandler totpHandler = new TOTPHandlerBastiaanJansenImpl(); // QR generates invalid code
-
+        TOTPHandler totpHandler = new TotpHandlerAmdelamarImpl(30);
 
         String barCodeUrl = totpHandler.getBarCodeURL(email, companyName);
         System.out.println("\tbarCodeUrl: \t" + barCodeUrl);
@@ -57,4 +56,7 @@ public class Main {
 
         }
     }
+
+
+
 }
