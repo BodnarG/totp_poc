@@ -14,7 +14,6 @@ import javax.crypto.Mac;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -28,10 +27,10 @@ public class TOTPHandlerJChambersImpl implements TOTPHandler {
 
     public TOTPHandlerJChambersImpl() throws NoSuchAlgorithmException {
         totp = new TimeBasedOneTimePasswordGenerator();
+        key = generateSecretSecurityKey();
     }
 
-    @Override
-    public Key generateSecretSecurityKey() {
+    private Key generateSecretSecurityKey() {
         try {
             final KeyGenerator keyGenerator = KeyGenerator.getInstance(totp.getAlgorithm());
 
@@ -49,7 +48,7 @@ public class TOTPHandlerJChambersImpl implements TOTPHandler {
     }
 
     @Override
-    public String getTOTPCode(Key key) {
+    public String getTOTPCode() {
         final Instant now = Instant.now();
         try {
             return totp.generateOneTimePasswordString(key, now);
@@ -59,12 +58,7 @@ public class TOTPHandlerJChambersImpl implements TOTPHandler {
     }
 
     @Override
-    public boolean verifyTOTP(String secretKey, String submittedOTP) {
-        return false;
-    }
-
-    @Override
-    public boolean verifyTOTP(Key key, String submittedOTP) {
+    public boolean verifyTOTP(String submittedOTP) {
         final Instant now = Instant.now();
         try {
             return submittedOTP.equals(totp.generateOneTimePasswordString(key, now));
@@ -74,16 +68,11 @@ public class TOTPHandlerJChambersImpl implements TOTPHandler {
     }
 
     @Override
-    public String getBarCodeURL(String secretKey, String account, String issuer) {
-        return null;
-    }
-
-    @Override
-    public String getBarCodeURLFromKey(Key secretKey, String account, String issuer) {
+    public String getBarCodeURL(String account, String issuer) {
 
         /*byte[] decodedBytes = Base64.getDecoder().decode(Utils.byteArrayToString(secretKey.getEncoded()).getBytes(StandardCharsets.UTF_8));
         String decodedString = new String(decodedBytes);*/
-        String decodedString = new String(Base64.getDecoder().decode(secretKey.getEncoded()));
+        String decodedString = new String(Base64.getDecoder().decode(key.getEncoded()));
         try {
             return "otpauth://totp/"
                     + Utils.urlEncodeAndReplacePlus(issuer + ":" + account)
@@ -100,14 +89,5 @@ public class TOTPHandlerJChambersImpl implements TOTPHandler {
         try (FileOutputStream out = new FileOutputStream(filePath)) {
             MatrixToImageWriter.writeToStream(matrix, "png", out);
         }
-    }
-
-    /**
-     * just for the case that all secret key type are not the same; Call this only in Utils.verifyToken
-     *
-     * @return
-     */
-    public Key getKey() {
-        return key;
     }
 }

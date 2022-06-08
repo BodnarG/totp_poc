@@ -1,44 +1,33 @@
 package totp;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
-import org.apache.commons.codec.binary.Base32;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.security.Key;
-import java.security.SecureRandom;
+import java.net.URISyntaxException;
 
 public interface TOTPHandler {
 
-    default String generateSecretKey() {
-        SecureRandom random = new SecureRandom();
-        byte[] bytes = new byte[20];
-        random.nextBytes(bytes);
-        Base32 base32 = new Base32();
-        return base32.encodeToString(bytes);
+    String getTOTPCode();
+
+    boolean verifyTOTP(String submittedOTP);
+
+    String getBarCodeURL(String account, String issuer) throws URISyntaxException;
+
+    default void saveQRCodeToFile(String barCodeData, String filePath, int height, int width) throws WriterException, IOException {
+        // com.google.zxing:core > MultiFormatWriter
+        BitMatrix matrix = new MultiFormatWriter().encode(barCodeData, BarcodeFormat.QR_CODE, width, height);
+        try (FileOutputStream out = new FileOutputStream(filePath)) {
+            MatrixToImageWriter.writeToStream(matrix, "png", out);
+        }
     }
 
-    default byte[] generateSecret() {throw new UnsupportedOperationException();}
-
-    default Key generateSecretSecurityKey() {
-        throw new UnsupportedOperationException();
+    default void saveQRCodeToFile(String account, String issuer, String filePath, int height, int width) throws WriterException, IOException, URISyntaxException {
+        String url = getBarCodeURL(account, issuer);
+        saveQRCodeToFile(url, filePath, height, width);
     }
-
-    default String getTOTPCode(String secretKey){throw new UnsupportedOperationException();}
-
-    default String getTOTPCode(byte[] secret){throw new UnsupportedOperationException();}
-
-    default String getTOTPCode(Key key) { throw new UnsupportedOperationException(); }
-
-    boolean verifyTOTP(String secretKey, String submittedOTP);
-
-    default boolean verifyTOTP(Key key, String submittedOTP) { throw new UnsupportedOperationException(); }
-
-    String getBarCodeURL(String secretKey, String account, String issuer);
-
-    default String getBarCodeURLFromKey(Key secretKey, String account, String issuer) {
-        throw new UnsupportedOperationException();
-    }
-
-
-    void saveQRCodeToFile(String barCodeData, String filePath, int height, int width) throws WriterException, IOException;
 }
