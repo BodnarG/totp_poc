@@ -7,6 +7,7 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import de.taimos.totp.TOTP;
 import dev.samstevens.totp.code.*;
+import dev.samstevens.totp.exceptions.CodeGenerationException;
 import dev.samstevens.totp.exceptions.QrGenerationException;
 import dev.samstevens.totp.qr.QrData;
 import dev.samstevens.totp.qr.QrGenerator;
@@ -24,27 +25,43 @@ import java.net.URISyntaxException;
 
 import static dev.samstevens.totp.util.Utils.getDataUriForImage;
 
+/**
+ * Implementation of TOTPHandler using https://github.com/samdjstevens/java-totp
+ */
 public class TOTPHandlerSamDJStevens implements TOTPHandler {
 
     private final String secretKey;
-    private String email;
-    private String companyName;
-
-    public TOTPHandlerSamDJStevens(String email, String companyName) {
-        this.email = email;
-        this.companyName = companyName;
+//    private String email;
+//    private String companyName;
+//
+//    public TOTPHandlerSamDJStevens(String email, String companyName) {
+//        this.email = email;
+//        this.companyName = companyName;
+//        this.secretKey = generateSecretKeyAsString();
+//    }
+    public TOTPHandlerSamDJStevens() {
         this.secretKey = generateSecretKeyAsString();
     }
 
     @Override
     public String getTOTPCode() {
-        return null;
+        try {
+            TimeProvider timeProvider = new SystemTimeProvider();
+            long currentBucket = Math.floorDiv(timeProvider.getTime(), 30);
+//            CodeGenerator codeGenerator = new DefaultCodeGenerator(HashingAlgorithm.SHA256);
+            CodeGenerator codeGenerator = new DefaultCodeGenerator();
+            return codeGenerator.generate(secretKey, currentBucket);
+        } catch (CodeGenerationException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public boolean verifyTOTP(String submittedOTP) {
         TimeProvider timeProvider = new SystemTimeProvider();
         CodeGenerator codeGenerator = new DefaultCodeGenerator();
+//        CodeGenerator codeGenerator = new DefaultCodeGenerator(HashingAlgorithm.SHA256);
         CodeVerifier verifier = new DefaultCodeVerifier(codeGenerator, timeProvider);
         return verifier.isValidCode(secretKey, submittedOTP);
     }

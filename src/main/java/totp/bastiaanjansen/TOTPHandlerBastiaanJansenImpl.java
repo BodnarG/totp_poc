@@ -9,8 +9,11 @@ import java.net.URISyntaxException;
 import java.time.Duration;
 import java.util.Arrays;
 
+/**
+ * Implementation of TOTPHandler using https://github.com/BastiaanJansen/otp-java
+ */
 public class TOTPHandlerBastiaanJansenImpl implements TOTPHandler {
-    private byte[] secret;
+    private byte[] secret; // Base32 encoded byte[]
     private TOTP totp;
 
     public TOTPHandlerBastiaanJansenImpl() {
@@ -40,16 +43,24 @@ public class TOTPHandlerBastiaanJansenImpl implements TOTPHandler {
     private void initTOTP() {
         initSecret();
         TOTP.Builder builder = new TOTP.Builder(secret);
+
         builder
                 .withPasswordLength(6)
-                .withAlgorithm(HMACAlgorithm.SHA256) // SHA1 and SHA512 are also supported
+                .withAlgorithm(HMACAlgorithm.SHA1)
+//                .withAlgorithm(HMACAlgorithm.SHA256)
                 .withPeriod(Duration.ofSeconds(30));
 
         totp = builder.build();
     }
 
     private void initSecret() {
-        secret = SecretGenerator.generate();
+        //bits: this should be greater than or equal to the length of the HMAC algorithm type
+        //        HMACAlgorithm.SHA1
+        //        HMACAlgorithm.SHA256
+        //        HMACAlgorithm.SHA512
+//        int bits = 256;
+//        secret = SecretGenerator.generate(bits);
+        secret = SecretGenerator.generate(); // << will be initialized by default 160 bits
         System.out.println("\tSecret: \t" + Arrays.toString(secret));
     }
 }

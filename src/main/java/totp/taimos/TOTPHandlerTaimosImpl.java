@@ -3,12 +3,16 @@ package totp.taimos;
 import de.taimos.totp.TOTP;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.codec.binary.Hex;
+import totp.HMACAlgorithm;
 import totp.TOTPHandler;
 import totp.Utils;
 
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 
+/**
+ * Implementation of TOTPHandler using https://mvnrepository.com/artifact/de.taimos/totp/1.0
+ */
 public class TOTPHandlerTaimosImpl implements TOTPHandler {
     private String secretKey;
 
@@ -19,7 +23,7 @@ public class TOTPHandlerTaimosImpl implements TOTPHandler {
 
     private void initSecret() {
         SecureRandom random = new SecureRandom();
-        byte[] bytes = new byte[20];
+        byte[] bytes = new byte[HMACAlgorithm.SHA1.getByteSize()];
         random.nextBytes(bytes);
         Base32 base32 = new Base32();
         secretKey = base32.encodeToString(bytes);

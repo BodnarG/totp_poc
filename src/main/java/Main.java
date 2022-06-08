@@ -2,7 +2,10 @@ import com.google.zxing.WriterException;
 import totp.TOTPHandler;
 import totp.Utils;
 import totp.amdelamar.TotpHandlerAmdelamarImpl;
+import totp.bastiaanjansen.TOTPHandlerBastiaanJansenImpl;
 import totp.samdjstevens.TOTPHandlerSamDJStevens;
+import totp.taimos.TOTPHandlerTaimosImpl;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -15,10 +18,11 @@ public class Main {
         String email = "test_" + now + "_@gmail.com";
         String companyName = "Awesome_Company_" + now;
 
-//        TOTPHandler totpHandler = new TOTPHandlerTaimosImpl();
-//        TOTPHandler totpHandler = new TOTPHandlerBastiaanJansenImpl(); // QR generates invalid code
-        //TOTPHandler totpHandler = new TotpHandlerAmdelamarImpl(30);
-        TOTPHandler totpHandler = new TOTPHandlerSamDJStevens(email, companyName);
+//        TOTPHandler totpHandler = new TOTPHandlerTaimosImpl(); // works, but supports only SHA1
+//        TOTPHandler totpHandler = new TotpHandlerAmdelamarImpl();  // works, but supports only SHA1
+
+        TOTPHandler totpHandler = new TOTPHandlerBastiaanJansenImpl(); // with SHA1 it works, but with SHA256 QR generates invalid code
+//        TOTPHandler totpHandler = new TOTPHandlerSamDJStevens(); // with SHA1 it works
 
         String barCodeUrl = totpHandler.getBarCodeURL(email, companyName);
         System.out.println("\tbarCodeUrl: \t" + barCodeUrl);

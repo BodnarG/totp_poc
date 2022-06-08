@@ -2,6 +2,7 @@ package totp.amdelamar;
 
 import com.amdelamar.jotp.OTP;
 import com.amdelamar.jotp.type.Type;
+import totp.HMACAlgorithm;
 import totp.TOTPHandler;
 import totp.Utils;
 
@@ -10,21 +11,21 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Implementation of TOTPHandler using https://github.com/amdelamar/jotp
+ */
 public class TotpHandlerAmdelamarImpl implements TOTPHandler {
-    private final int length;
     private final String secretKey;
 
-    public TotpHandlerAmdelamarImpl(int length) {
+    public TotpHandlerAmdelamarImpl() {
         super();
-        this.length = length;
         this.secretKey = generateSecretKeyAsString();
     }
 
     @Override
     public String getTOTPCode() {
-        String hexTime;
         try {
-            hexTime = OTP.timeInHex(System.currentTimeMillis(), 30);
+            String hexTime = OTP.timeInHex(System.currentTimeMillis(), 30);
             return OTP.create(secretKey, hexTime, 6, Type.TOTP);
         } catch (IOException | InvalidKeyException | NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
@@ -49,6 +50,6 @@ public class TotpHandlerAmdelamarImpl implements TOTPHandler {
     }
 
     private String generateSecretKeyAsString() {
-        return OTP.randomBase32(length);
+        return OTP.randomBase32(HMACAlgorithm.SHA1.getByteSize());
     }
 }
