@@ -1,7 +1,5 @@
 package totp;
 
-import totp.jchambers.TOTPHandlerJChambersImpl;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -27,7 +25,6 @@ public class Utils {
     public static String urlEncodeAndReplacePlus(String str) throws UnsupportedEncodingException {
         return URLEncoder.encode(str, StandardCharsets.UTF_8).replace("+", "%20");
     }
-
 
     public static void verifyToken(TOTPHandler totpHandler) {
         System.out.println("Please write in the OTP code:");
