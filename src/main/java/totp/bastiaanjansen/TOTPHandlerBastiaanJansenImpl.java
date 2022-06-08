@@ -1,35 +1,51 @@
 package totp.bastiaanjansen;
 
-
-import com.google.zxing.WriterException;
+import com.bastiaanjansen.otp.HMACAlgorithm;
+import com.bastiaanjansen.otp.SecretGenerator;
+import com.bastiaanjansen.otp.TOTP;
 import totp.TOTPHandler;
 
-import java.io.IOException;
+import java.net.URISyntaxException;
+import java.time.Duration;
+import java.util.Arrays;
 
 public class TOTPHandlerBastiaanJansenImpl implements TOTPHandler {
 
-    @Override
-    public String generateSecretKey() {
-        return TOTPHandler.super.generateSecretKey();
+    private byte[] secret;
+
+
+    public TOTPHandlerBastiaanJansenImpl() {
+        super();
+        initSecret();
+    }
+
+    private void initSecret() {
+        secret = SecretGenerator.generate();
+        System.out.println("\tSecret: \t" + Arrays.toString(secret));
     }
 
     @Override
-    public String getTOTPCode(String secretKey) {
-        return null;
+    public String getTOTPCode() {
+        return initTOTP(secret).now();
     }
 
     @Override
-    public boolean verifyTOTP(String secretKey, String submittedOTP) {
-        return false;
+    public boolean verifyTOTP(String submittedOTP) {
+        return initTOTP(secret).verify(submittedOTP);
     }
 
     @Override
-    public String getBarCodeURL(String secretKey, String account, String issuer) {
-        return null;
+    public String getBarCodeURL(String account, String issuer) throws URISyntaxException {
+        return initTOTP(secret).getURI(issuer, account).toString();
     }
 
-    @Override
-    public void saveQRCodeToFile(String barCodeData, String filePath, int height, int width) throws WriterException, IOException {
+    private TOTP initTOTP(byte[] secret) {
+        TOTP.Builder builder = new TOTP.Builder(secret);
+        builder
+                .withPasswordLength(6)
+                .withAlgorithm(HMACAlgorithm.SHA256) // SHA1 and SHA512 are also supported
+                .withPeriod(Duration.ofSeconds(30));
 
+        return builder.build();
     }
 }

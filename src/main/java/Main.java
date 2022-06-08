@@ -1,39 +1,60 @@
 import com.google.zxing.WriterException;
 import totp.TOTPHandler;
 import totp.Utils;
+import totp.bastiaanjansen.TOTPHandlerBastiaanJansenImpl;
 import totp.taimos.TOTPHandlerTaimosImpl;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Main {
-    public static void main(String[] args) throws IOException, WriterException {
-        String email = "test@gmail.com";
-        String companyName = "Awesome Company";
+    public static void main(String[] args) throws IOException, WriterException, URISyntaxException {
+        final long now = System.currentTimeMillis();
+        String email = "test_" + now + "_@gmail.com";
+        String companyName = "Awesome_Company_" + now;
 
         TOTPHandler totpHandler = new TOTPHandlerTaimosImpl();
-
-        String secretKey = totpHandler.generateSecretKey();
-        String barCodeUrl = totpHandler.getBarCodeURL(secretKey, email, companyName);
-        totpHandler.saveQRCodeToFile(barCodeUrl, "QRCode_" + System.currentTimeMillis() + ".png", 400, 400);
-
-        System.out.println("secretKey: \t"+secretKey);
-        System.out.println("barCodeUrl: \t"+barCodeUrl);
+//        TOTPHandler totpHandler = new TOTPHandlerBastiaanJansenImpl(); // QR generates invalid code
 
 
-        Utils.verifyToken(totpHandler, secretKey);
+        String barCodeUrl = totpHandler.getBarCodeURL(email, companyName);
+        System.out.println("\tbarCodeUrl: \t" + barCodeUrl);
+        System.out.println("\tCurrent code: " + totpHandler.getTOTPCode());
 
-//        String lastCode = null;
-//        while (true) {
-//            String code = Utils.getTOTPCode(secretKey);
-//            if (!code.equals(lastCode)) {
-//                System.out.println(code);
-//            }
-//            lastCode = code;
-//            try {
-//                Thread.sleep(500);
-//            } catch (InterruptedException e) {};
-//        }
+        totpHandler.saveQRCodeToFile(barCodeUrl, "QRCode_" + now + ".png", 400, 400);
 
 
+//        testCode(totpHandler);
+        testCodeWithDebugPrintForNewCode(totpHandler);
+    }
+
+    private static void testCode(TOTPHandler totpHandler) {
+        Utils.verifyToken(totpHandler);
+    }
+
+    private static void testCodeWithDebugPrintForNewCode(TOTPHandler totpHandler) {
+        try {
+            List<Callable<Object>> processesToRun = new ArrayList<>();
+            Callable<Object> c1 = () -> {
+                Utils.verifyToken(totpHandler);
+                return null;
+            };
+            Callable<Object> c2 = () -> {
+                Utils.printCodes(totpHandler);
+                return null;
+            };
+            processesToRun.add(c1);
+            processesToRun.add(c2);
+            ExecutorService exec = Executors.newFixedThreadPool(2);
+            exec.invokeAll(processesToRun);
+
+        } catch (Exception ignored) {
+
+        }
     }
 }
