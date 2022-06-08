@@ -7,6 +7,7 @@ import totp.TOTPHandler;
 import totp.Utils;
 
 import java.io.UnsupportedEncodingException;
+import java.security.SecureRandom;
 
 public class TOTPHandlerTaimosImpl implements TOTPHandler {
     private String secretKey;
@@ -17,7 +18,11 @@ public class TOTPHandlerTaimosImpl implements TOTPHandler {
     }
 
     private void initSecret() {
-        secretKey = TOTPHandler.super.generateSecretKeyAsString();
+        SecureRandom random = new SecureRandom();
+        byte[] bytes = new byte[20];
+        random.nextBytes(bytes);
+        Base32 base32 = new Base32();
+        secretKey = base32.encodeToString(bytes);
         System.out.println("\tSecret: \t" + secretKey);
     }
 

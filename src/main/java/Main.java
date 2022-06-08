@@ -29,7 +29,6 @@ public class Main {
 
         totpHandler.saveQRCodeToFile(barCodeUrl, "QRCode_" + now + ".png", 400, 400);
 
-
 //        testCode(totpHandler);
         testCodeWithDebugPrintForNewCode(totpHandler);
     }
@@ -58,7 +57,4 @@ public class Main {
 
         }
     }
-
-
-
 }

@@ -26,20 +26,20 @@ public class TOTPHandlerBastiaanJansenImpl implements TOTPHandler {
 
     @Override
     public String getTOTPCode() {
-        return initTOTP(secret).now();
+        return initTOTP().now();
     }
 
     @Override
     public boolean verifyTOTP(String submittedOTP) {
-        return initTOTP(secret).verify(submittedOTP);
+        return initTOTP().verify(submittedOTP);
     }
 
     @Override
     public String getBarCodeURL(String account, String issuer) throws URISyntaxException {
-        return initTOTP(secret).getURI(issuer, account).toString();
+        return initTOTP().getURI(issuer, account).toString();
     }
 
-    private TOTP initTOTP(byte[] secret) {
+    private TOTP initTOTP() {
         TOTP.Builder builder = new TOTP.Builder(secret);
         builder
                 .withPasswordLength(6)
