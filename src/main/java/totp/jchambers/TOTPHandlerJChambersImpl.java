@@ -21,11 +21,14 @@ import java.time.Instant;
 import java.util.Base64;
 
 public class TOTPHandlerJChambersImpl implements TOTPHandler {
-
+    final private String account;
+    final private String issuer;
     private final TimeBasedOneTimePasswordGenerator totp;
     private Key key;
 
-    public TOTPHandlerJChambersImpl() throws NoSuchAlgorithmException {
+    public TOTPHandlerJChambersImpl(String account, String issuer) throws NoSuchAlgorithmException {
+        this.account = account;
+        this.issuer = issuer;
         totp = new TimeBasedOneTimePasswordGenerator();
         key = generateSecretSecurityKey();
     }
@@ -68,7 +71,7 @@ public class TOTPHandlerJChambersImpl implements TOTPHandler {
     }
 
     @Override
-    public String getBarCodeURL(String account, String issuer) {
+    public String getBarCodeURL() {
 
         /*byte[] decodedBytes = Base64.getDecoder().decode(Utils.byteArrayToString(secretKey.getEncoded()).getBytes(StandardCharsets.UTF_8));
         String decodedString = new String(decodedBytes);*/

@@ -1,11 +1,6 @@
 package totp.samdjstevens;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
-import de.taimos.totp.TOTP;
 import dev.samstevens.totp.code.*;
 import dev.samstevens.totp.exceptions.CodeGenerationException;
 import dev.samstevens.totp.exceptions.QrGenerationException;
@@ -21,7 +16,6 @@ import totp.Utils;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 
 import static dev.samstevens.totp.util.Utils.getDataUriForImage;
 
@@ -29,17 +23,14 @@ import static dev.samstevens.totp.util.Utils.getDataUriForImage;
  * Implementation of TOTPHandler using https://github.com/samdjstevens/java-totp
  */
 public class TOTPHandlerSamDJStevens implements TOTPHandler {
+    final private String account;
+    final private String issuer;
 
     private final String secretKey;
-//    private String email;
-//    private String companyName;
-//
-//    public TOTPHandlerSamDJStevens(String email, String companyName) {
-//        this.email = email;
-//        this.companyName = companyName;
-//        this.secretKey = generateSecretKeyAsString();
-//    }
-    public TOTPHandlerSamDJStevens() {
+
+    public TOTPHandlerSamDJStevens(String account, String issuer) {
+        this.account = account;
+        this.issuer = issuer;
         this.secretKey = generateSecretKeyAsString();
     }
 
@@ -67,7 +58,7 @@ public class TOTPHandlerSamDJStevens implements TOTPHandler {
     }
 
     @Override
-    public String getBarCodeURL(String account, String issuer) {
+    public String getBarCodeURL() {
         try {
             return "otpauth://totp/"
                     + Utils.urlEncodeAndReplacePlus(issuer + ":" + account)
@@ -80,32 +71,45 @@ public class TOTPHandlerSamDJStevens implements TOTPHandler {
 
     @Override
     public void saveQRCodeToFile(String barCodeData, String filePath, int height, int width) {
-//        QrData data = new QrData.Builder()
-//                .label(email)
-//                .secret(secretKey)
-//                .issuer(companyName)
-//                .algorithm(HashingAlgorithm.SHA1) // More on this below
-//                .digits(6)
-//                .period(30)
-//                .build();
 
-        //saveQRCodeToFile(data.toString(), filePath, height, width);
+        try {
+            QrData data = new QrData.Builder()
+                    .label(issuer + ":" + account)
+//                    .label("ISSUER_PART:ACCOUNT_NAME@issuer_name_from_account_address.com") // issuer >> what is defined before the ":"
+//                    .label("ACCOUNT_NAME@issuer_name_from_account_address.com") // issuer >> (domain) from email address
+//                    .label("ACCOUNT_NAME_NOT_EMAIL") // issuer >>  the issuer from the "issuer" variable
+                    .secret(secretKey)
+                    .issuer(issuer)
+                    .algorithm(HashingAlgorithm.SHA1)
+                    .digits(6)
+                    .period(30)
+                    .build();
 
-//        QrGenerator generator = new ZxingPngQrGenerator();
-//        byte[] imageData;
-//        try {
-//            imageData = generator.generate(data);
-//        } catch (QrGenerationException e) {
-//            throw new RuntimeException(e);
-//        }
-//        String mimeType = generator.getImageMimeType();
-//        String dataUri = getDataUriForImage(imageData, mimeType);
+            QrGenerator generator = new ZxingPngQrGenerator();
+
+            byte[] imageData = generator.generate(data);
+
+            try (FileOutputStream outputStream = new FileOutputStream(filePath)) {
+                // write png's byte[] to file
+                outputStream.write(imageData);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+//            String mimeType = generator.getImageMimeType();            // mimeType = "image/png"
+//            String dataUri = getDataUriForImage(imageData, mimeType);  // dataUri = data:image/png;base64,iVBORw0KGgoAAAANSU...
+//            System.out.println("\t uri: \t"+data.getUri());
+//            System.out.println("\t dataUri: \t"+dataUri);
+
+        } catch (QrGenerationException e) {
+            e.printStackTrace();
+        }
 
         TOTPHandler.super.saveQRCodeToFile(barCodeData, filePath, height, width);
     }
 
     private String generateSecretKeyAsString() {
-        DefaultSecretGenerator secretGenerator = new DefaultSecretGenerator();
+        DefaultSecretGenerator secretGenerator = new DefaultSecretGenerator();  // numCharacters = 32 >> 32*5 bits = 160 bits > SHA1
         return secretGenerator.generate();
     }
 }

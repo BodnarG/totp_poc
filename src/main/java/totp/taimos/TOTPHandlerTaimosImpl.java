@@ -14,10 +14,14 @@ import java.security.SecureRandom;
  * Implementation of TOTPHandler using https://mvnrepository.com/artifact/de.taimos/totp/1.0
  */
 public class TOTPHandlerTaimosImpl implements TOTPHandler {
+    final private String account;
+    final private String issuer;
     private String secretKey;
 
-    public TOTPHandlerTaimosImpl() {
+    public TOTPHandlerTaimosImpl(String account, String issuer) {
         super();
+        this.account = account;
+        this.issuer = issuer;
         initSecret();
     }
 
@@ -44,7 +48,7 @@ public class TOTPHandlerTaimosImpl implements TOTPHandler {
     }
 
     @Override
-    public String getBarCodeURL(String account, String issuer) {
+    public String getBarCodeURL() {
         try {
             return "otpauth://totp/"
                     + Utils.urlEncodeAndReplacePlus(issuer + ":" + account)

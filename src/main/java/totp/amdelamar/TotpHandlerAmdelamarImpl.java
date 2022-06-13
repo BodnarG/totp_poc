@@ -15,10 +15,14 @@ import java.security.NoSuchAlgorithmException;
  * Implementation of TOTPHandler using https://github.com/amdelamar/jotp
  */
 public class TotpHandlerAmdelamarImpl implements TOTPHandler {
+    final private String account;
+    final private String issuer;
     private final String secretKey;
 
-    public TotpHandlerAmdelamarImpl() {
+    public TotpHandlerAmdelamarImpl(String account, String issuer) {
         super();
+        this.account = account;
+        this.issuer = issuer;
         this.secretKey = generateSecretKeyAsString();
     }
 
@@ -38,7 +42,7 @@ public class TotpHandlerAmdelamarImpl implements TOTPHandler {
     }
 
     @Override
-    public String getBarCodeURL(String account, String issuer) {
+    public String getBarCodeURL() {
         try {
             return "otpauth://totp/"
                     + Utils.urlEncodeAndReplacePlus(issuer + ":" + account)

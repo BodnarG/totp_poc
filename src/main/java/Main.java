@@ -1,11 +1,12 @@
-import com.google.zxing.WriterException;
 import totp.TOTPHandler;
 import totp.Utils;
 import totp.amdelamar.TotpHandlerAmdelamarImpl;
 import totp.bastiaanjansen.TOTPHandlerBastiaanJansenImpl;
+import totp.jchambers.TOTPHandlerJChambersImpl;
 import totp.samdjstevens.TOTPHandlerSamDJStevens;
 import totp.taimos.TOTPHandlerTaimosImpl;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -13,20 +14,22 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchAlgorithmException {
         final long now = System.currentTimeMillis();
-        String email = "test_" + now + "_@gmail.com";
-        String companyName = "Awesome_Company_" + now;
+        String account = "user@company.com";
+        String issuer = "Awesome Company";
 
-//        TOTPHandler totpHandler = new TOTPHandlerTaimosImpl(); // works, but supports only SHA1
-//        TOTPHandler totpHandler = new TotpHandlerAmdelamarImpl();  // works, but supports only SHA1
+//        TOTPHandler totpHandler = new TOTPHandlerTaimosImpl(account, issuer); // works, but supports only SHA1
+//        TOTPHandler totpHandler2 = new TotpHandlerAmdelamarImpl(account, issuer);  // works, but supports only SHA1
+//        TOTPHandler totpHandler3 = new TOTPHandlerJChambersImpl(account, issuer);
 
-        TOTPHandler totpHandler = new TOTPHandlerBastiaanJansenImpl(); // with SHA1 it works, but with SHA256 QR generates invalid code
-//        TOTPHandler totpHandler = new TOTPHandlerSamDJStevens(); // with SHA1 it works
+//        TOTPHandler totpHandler4 = new TOTPHandlerBastiaanJansenImpl(account, issuer); // with SHA1 it works, but with SHA256 QR generates invalid code
+        TOTPHandler totpHandler = new TOTPHandlerSamDJStevens(account, issuer); // with SHA1 it works
 
-        String barCodeUrl = totpHandler.getBarCodeURL(email, companyName);
+        String barCodeUrl = totpHandler.getBarCodeURL();
         System.out.println("\tbarCodeUrl: \t" + barCodeUrl);
         System.out.println("\tCurrent code: \t" + totpHandler.getTOTPCode());
+        totpHandler.getQRCodeDataAsURL(barCodeUrl, 400, 400);
 
         totpHandler.saveQRCodeToFile(barCodeUrl, "QRCode_" + now + ".png", 400, 400);
 

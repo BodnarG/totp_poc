@@ -13,11 +13,15 @@ import java.util.Arrays;
  * Implementation of TOTPHandler using https://github.com/BastiaanJansen/otp-java
  */
 public class TOTPHandlerBastiaanJansenImpl implements TOTPHandler {
+    final private String account;
+    final private String issuer;
     private byte[] secret; // Base32 encoded byte[]
     private TOTP totp;
 
-    public TOTPHandlerBastiaanJansenImpl() {
+    public TOTPHandlerBastiaanJansenImpl(String account, String issuer) {
         super();
+        this.account = account;
+        this.issuer = issuer;
         initTOTP();
     }
 
@@ -32,7 +36,7 @@ public class TOTPHandlerBastiaanJansenImpl implements TOTPHandler {
     }
 
     @Override
-    public String getBarCodeURL(String account, String issuer) {
+    public String getBarCodeURL() {
         try {
             return totp.getURI(issuer, account).toString();
         } catch (URISyntaxException e) {
