@@ -52,7 +52,7 @@ public interface TOTPHandler {
         }
     }
 
-    private void writeToStream(OutputStream outputStream, String data, int height, int width) throws WriterException, IOException {
+    default void writeToStream(OutputStream outputStream, String data, int height, int width) throws WriterException, IOException {
         // com.google.zxing:core > MultiFormatWriter > QRCodeWriter
         Writer writer = new MultiFormatWriter();
         BitMatrix bitMatrix = writer.encode(data, BarcodeFormat.QR_CODE, height, width);

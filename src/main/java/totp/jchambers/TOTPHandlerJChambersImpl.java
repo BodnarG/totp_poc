@@ -29,25 +29,17 @@ public class TOTPHandlerJChambersImpl implements TOTPHandler {
     public TOTPHandlerJChambersImpl(String account, String issuer) throws NoSuchAlgorithmException {
         this.account = account;
         this.issuer = issuer;
-        totp = new TimeBasedOneTimePasswordGenerator();
-        key = generateSecretSecurityKey();
-    }
+        totp = new TimeBasedOneTimePasswordGenerator(); // default: Duration.ofSeconds(30), length: 6 chars, alg: SHA1
+        // TimeBasedOneTimePasswordGenerator(timeStep)
+        // TimeBasedOneTimePasswordGenerator(timeStep, passwordLength)
+        // TimeBasedOneTimePasswordGenerator(timeStep, passwordLength, algorithm)
+                //  DEFAULT_TIME_STEP = Duration.ofSeconds(30)
+                //  DEFAULT_PASSWORD_LENGTH = 6
+                //    TimeBasedOneTimePasswordGenerator.TOTP_ALGORITHM_HMAC_SHA1
+                //    TimeBasedOneTimePasswordGenerator.TOTP_ALGORITHM_HMAC_SHA256
+                //    TimeBasedOneTimePasswordGenerator.TOTP_ALGORITHM_HMAC_SHA512
 
-    private Key generateSecretSecurityKey() {
-        try {
-            final KeyGenerator keyGenerator = KeyGenerator.getInstance(totp.getAlgorithm());
-
-            // Key length should match the length of the HMAC output (160 bits for SHA-1, 256 bits
-            // for SHA-256, and 512 bits for SHA-512). Note that while Mac#getMacLength() returns a
-            // length in _bytes,_ KeyGenerator#init(int) takes a key length in _bits._
-            final int macLengthInBytes = Mac.getInstance(totp.getAlgorithm()).getMacLength();
-            keyGenerator.init(macLengthInBytes * 8);
-
-            key = keyGenerator.generateKey();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-        return key;
+        generateSecretSecurityKey();
     }
 
     @Override
@@ -73,9 +65,13 @@ public class TOTPHandlerJChambersImpl implements TOTPHandler {
     @Override
     public String getBarCodeURL() {
 
+        // TODO make it somehow work
+
         /*byte[] decodedBytes = Base64.getDecoder().decode(Utils.byteArrayToString(secretKey.getEncoded()).getBytes(StandardCharsets.UTF_8));
         String decodedString = new String(decodedBytes);*/
+
         String decodedString = new String(Base64.getDecoder().decode(key.getEncoded()));
+
         try {
             return "otpauth://totp/"
                     + Utils.urlEncodeAndReplacePlus(issuer + ":" + account)
@@ -89,10 +85,24 @@ public class TOTPHandlerJChambersImpl implements TOTPHandler {
     @Override
     public void saveQRCodeToFile(String barCodeData, String filePath, int height, int width) {
         try (FileOutputStream out = new FileOutputStream(filePath)) {
-            BitMatrix matrix = new MultiFormatWriter().encode(barCodeData, BarcodeFormat.QR_CODE, width, height);
-            MatrixToImageWriter.writeToStream(matrix, "png", out);
+            writeToStream(out, barCodeData, height, width);
         } catch (IOException | WriterException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void generateSecretSecurityKey() {
+        try {
+            final KeyGenerator keyGenerator = KeyGenerator.getInstance(totp.getAlgorithm());
+
+            // Key length should match the length of the HMAC output (160 bits for SHA-1, 256 bits for SHA-256, and 512 bits for SHA-512).
+            // Note that while Mac#getMacLength() returns a length in _bytes,_ KeyGenerator#init(int) takes a key length in _bits._
+            final int macLengthInBytes = Mac.getInstance(totp.getAlgorithm()).getMacLength();
+            keyGenerator.init(macLengthInBytes * 8);
+
+            key = keyGenerator.generateKey();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
     }
 }

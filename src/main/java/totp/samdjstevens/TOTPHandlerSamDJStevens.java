@@ -96,16 +96,9 @@ public class TOTPHandlerSamDJStevens implements TOTPHandler {
                 e.printStackTrace();
             }
 
-//            String mimeType = generator.getImageMimeType();            // mimeType = "image/png"
-//            String dataUri = getDataUriForImage(imageData, mimeType);  // dataUri = data:image/png;base64,iVBORw0KGgoAAAANSU...
-//            System.out.println("\t uri: \t"+data.getUri());
-//            System.out.println("\t dataUri: \t"+dataUri);
-
         } catch (QrGenerationException e) {
             e.printStackTrace();
         }
-
-        TOTPHandler.super.saveQRCodeToFile(barCodeData, filePath, height, width);
     }
 
     private String generateSecretKeyAsString() {

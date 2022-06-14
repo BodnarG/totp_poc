@@ -4,7 +4,9 @@ import com.bastiaanjansen.otp.HMACAlgorithm;
 import com.bastiaanjansen.otp.SecretGenerator;
 import com.bastiaanjansen.otp.TOTP;
 import totp.TOTPHandler;
+import totp.Utils;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.time.Duration;
 import java.util.Arrays;
@@ -38,8 +40,8 @@ public class TOTPHandlerBastiaanJansenImpl implements TOTPHandler {
     @Override
     public String getBarCodeURL() {
         try {
-            return totp.getURI(issuer, account).toString();
-        } catch (URISyntaxException e) {
+            return totp.getURI(Utils.urlEncodeAndReplacePlus(issuer), account).toString();
+        } catch (URISyntaxException | UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
     }

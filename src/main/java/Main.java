@@ -20,10 +20,10 @@ public class Main {
         String issuer = "Awesome Company";
 
 //        TOTPHandler totpHandler = new TOTPHandlerTaimosImpl(account, issuer); // works, but supports only SHA1
-//        TOTPHandler totpHandler2 = new TotpHandlerAmdelamarImpl(account, issuer);  // works, but supports only SHA1
-//        TOTPHandler totpHandler3 = new TOTPHandlerJChambersImpl(account, issuer);
+//        TOTPHandler totpHandler = new TotpHandlerAmdelamarImpl(account, issuer);  // works, but supports only SHA1
+//        TOTPHandler totpHandler = new TOTPHandlerJChambersImpl(account, issuer);
 
-//        TOTPHandler totpHandler4 = new TOTPHandlerBastiaanJansenImpl(account, issuer); // with SHA1 it works, but with SHA256 QR generates invalid code
+//        TOTPHandler totpHandler = new TOTPHandlerBastiaanJansenImpl(account, issuer); // with SHA1 it works, but with SHA256 QR generates invalid code
         TOTPHandler totpHandler = new TOTPHandlerSamDJStevens(account, issuer); // with SHA1 it works
 
         String barCodeUrl = totpHandler.getBarCodeURL();
